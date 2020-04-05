@@ -1,0 +1,12 @@
+.table {
+    border: 1px solid gray;
+    color: red;
+    width: 100%;
+    padding: 20px;
+}
+
+.table td {
+    color : red;
+    padding: 10px;
+}
+
