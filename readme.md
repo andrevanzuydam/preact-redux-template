@@ -3,7 +3,7 @@
 #### Introduction
 
 Setting up a react project with redux may be quite easy for some but takes time to find examples
-and create the layout for just getting to development.
+and create the layout for just getting to development. It also has Bootstrap 4 added to the template with an example Nav and Footer for convenience.
 
 This project has the basic Redux flow with examples of components and interactions with components and state.
 
