@@ -26,8 +26,6 @@ class ProfileComponent extends Component {
     //What does this do ?
     refreshComponent (store) {
         //Do some calculations with the values passed to the state
-
-        store.userSession.username += ' EEEEE';
         this.setState(store)
     };
 

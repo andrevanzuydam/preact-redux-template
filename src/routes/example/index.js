@@ -4,7 +4,12 @@ import Login from "../../components/login";
 
 
 class Example extends Component {
+
+
+
+
     render() {
+
         return (
             <>
                 <h1>Example Redux Preact Components</h1>

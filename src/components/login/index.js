@@ -36,17 +36,17 @@ class LoginForm extends Component {
     render() {
         const { email, username } = this.state;
         return (
-            <div class="card">
+            <div className="card">
 
-                <div class="card-body">
-                    <h5 class="card-title">Login</h5>
-                <form onSubmit={this.handleSubmit}>
-                    <div>
-                        <BSInput type="text" label="Username" name="username" value={username} onChange={this.handleChange}/>
-                        <BSInput type="password" label="Password" name="password" onChange={this.handleChange}/>
-                    </div>
-                    <button class="btn btn-primary" type="submit">Submit</button>
-                </form>
+                <div className="card-body">
+                    <h5 className="card-title">Login</h5>
+                    <form onSubmit={this.handleSubmit}>
+                        <div>
+                            <BSInput type="text" label="Username" name="username" value={username} onChange={this.handleChange}/>
+                            <BSInput type="password" label="Password" name="password" onChange={this.handleChange}/>
+                        </div>
+                        <button class="btn btn-primary" type="submit">Submit</button>
+                    </form>
                 </div>
             </div>
 
