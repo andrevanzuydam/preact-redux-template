@@ -20,9 +20,16 @@ class ProfileComponent extends Component {
 
     componentDidMount() {
         this.setState(globalStore.getState());
+        //Do any API fetches
     }
 
-    refreshComponent = state => this.setState(state);
+    //What does this do ?
+    refreshComponent (store) {
+        //Do some calculations with the values passed to the state
+
+        store.userSession.username += ' EEEEE';
+        this.setState(store)
+    };
 
     render() {
         const { userSession } = this.state;

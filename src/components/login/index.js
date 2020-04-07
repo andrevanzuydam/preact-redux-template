@@ -1,6 +1,5 @@
 import { Component } from "preact";
 import { connect } from "react-redux";
-import globalStore from "../../store";
 import { updateProfile } from "../../actions/index";
 import BSInput from "../bs-input";
 

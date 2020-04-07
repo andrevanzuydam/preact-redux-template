@@ -2,6 +2,8 @@ import { UPDATE_COUNTER, UPDATE_PROFILE } from "../actions";
 
 const initialState = {
     userSession: {email: 'test@test.com', username: 'test', token: null, counter: 0}
+
+
 };
 
 function rootReducer(state = initialState, action) {
