@@ -1,4 +1,5 @@
 import { Component } from 'preact';
+import DataTableGrid from "../../components/data-table";
 
 class Grid extends Component {
     state = {
@@ -36,14 +37,15 @@ class Grid extends Component {
         } else if (!isLoaded) {
             return <div>Loading...</div>;
         } else {
+            const columns = [{
+                data: "id", title: "ID"
+            }, {
+                data: "name", title: "Name"
+            }];
+
+            const data = [{id: 1, name: "Test"},  {id: 2, name: "Something"}]
             return (
-                <ul>
-                    {items.map(item => (
-                        <li key={item.id}>
-                            {item.employee_name}
-                        </li>
-                    ))}
-                </ul>
+                <DataTableGrid title="Example Grid" name="testGrid" columns={columns} data={data}  />
             );
         }
     }

@@ -25,7 +25,6 @@ export default class App extends Component {
 					</Router>
 
 			</div>
-			<Footer/>
 			</Provider>
 		);
 	}

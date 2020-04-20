@@ -24,9 +24,15 @@
     "sirv-cli": "^0.4.5"
   },
   "dependencies": {
+    "cross-blob": "^1.2.2",
+    "datatables.net": "^1.10.20",
+    "jquery": "^3.5.0",
     "preact": "^10.1.0",
-    "preact-render-to-string": "^5.1.2",
+    "preact-helmet": "^4.0.0-alpha-3",
+    "preact-render-to-string": "^5.1.6",
     "preact-router": "^3.2.1",
+    "prop-types": "^15.7.2",
+    "qrcode.react": "^1.0.0",
     "react-redux": "^7.2.0",
     "redux": "^4.0.5"
   }
