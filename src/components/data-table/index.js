@@ -110,18 +110,56 @@ class DataTableGrid extends Component {
         }
     }
 
+    getFormData () {
+        const {name, path} = this.props;
+        const modalForm = `form${name}`;
+        const recordId = `${name}id`;
+        let id = $(`#${recordId}`).val();
+        let data = new FormData();
+        data.append('id', id);
+
+
+        jQuery(`#${modalForm} select, #${modalForm} input, #${modalForm} textarea`).each(function(key, element){
+            console.log ('READING', element);
+            if (element.name) {
+                if (element.type == 'file') {
+                    let fileData = element.files[0];
+                    if (fileData !== undefined) {
+                        data.append (element.name, fileData, fileData.name);
+                    }
+                    data.append(element.name, element.value);
+                } else
+                if (element.type == 'checkbox') {
+                    if (element.checked) { data.append(element.name, element.value) } else { data.append(element.name, 0) };
+                } else {
+                    data.append(element.name, element.value);
+                }
+            }
+        });
+
+        console.log(data);
+
+        return data;
+    }
+
     saveForm(createRecord) {
-        console.log ('SAVING', createRecord);
+        const {onSave} = this.props;
+        console.log ('SAVING', createRecord, this.getFormData());
+        if (onSave !== undefined) {
+            onSave (this.getFormData());
+        }
     }
 
     handlePopulateClick(data) {
         console.log ('POPULATE', data, jQuery(this.modalRef.current), this);
         this.populateFormData(data, this.modalRef.current);
-        //jQuery(this.modalRef.current).modal('toggle');
     }
 
-    handleDeleteClick() {
-        console.log ('DELETE', $(this.modalRef.current), this.data);
+    handleDeleteClick(data) {
+        const {onDelete} = this.props;
+        if (onDelete !== undefined) {
+            onDelete (data);
+        }
 
     }
 
@@ -264,65 +302,50 @@ class DataTableGrid extends Component {
                     </div>
                     </form>
                 </div>
-                <Helmet><script>{`  
-                    
-                    
-                    function get${name}FormData() {
-                        let id = $('#${recordId}').val();
-                        let data = new FormData();
-                    
-                        $("#${modalForm} select, #${modalForm} input, #${modalForm} textarea").each(function(key, element){                   
-                            if (element.name) {
-                                if (element.type == 'file') {
-                                    let fileData = element.files[0];
-                                    if (fileData !== undefined) {
-                                      data.append (element.name, fileData, fileData.name);
-                                    }
-                                    data.append(element.name, element.value);
-                                } else
-                                if (element.type == 'checkbox') {
-                                    if (element.checked) { data.append(element.name, element.value) } else { data.append(element.name, 0) };
-                                } else {
-                                    data.append(element.name, element.value);
-                                }
-                            }
-                        });                     
-                      
-                        return data;
-                    }
-                    
+            </div>
+
+        );
+    }
+}
+
+/**
+ * <Helmet><script>{`
+
+
+
+
                     function save${name}Form(newRecord) {
                         let id = $('#${recordId}').val();
                         let data = get${name}FormData();
-                                         
+
                         if (newRecord) {
                             fetch('${path}', {method: 'POST', body: data} )
                             .then(res => res.json())
                             .then(function(result){
-                               window.MyDataTables.${name}.ajax.reload(null, false);                             
+                               window.MyDataTables.${name}.ajax.reload(null, false);
                             })
                             .catch(function(error) {
                                console.log ('Could not create data for ${recordName}', error);
                              });
-                        
+
                         } else {
                             fetch('${path}/'+id, {method: 'POST', body: data} )
                             .then(res => res.json())
                             .then(function(result){
-                                window.MyDataTables.${name}.ajax.reload(null, false);                              
+                                window.MyDataTables.${name}.ajax.reload(null, false);
                             })
                             .catch(function(error) {
                                 console.log ('Could not save data for ${recordName}', error);
                              });
                          }
                     }
-                    
+
                     function delete${name}(id) {
                         if (confirm('Are you sure you want to delete this ${recordName}?')){
                             fetch('${path}/'+id, {method: 'DELETE'} )
                             .then(res => res.json())
                             .then(function(result){
-                                window.MyDataTables.${name}.ajax.reload(null, false);     
+                                window.MyDataTables.${name}.ajax.reload(null, false);
                                 console.log ('Deleted', result);
                             })
                             .catch(function(error) {
@@ -330,13 +353,8 @@ class DataTableGrid extends Component {
                              });
                          }
                     }
-                    
-                   
+
+
                 `}</script></Helmet>
-            </div>
-
-        );
-    }
-}
-
+ */
 export default DataTableGrid;

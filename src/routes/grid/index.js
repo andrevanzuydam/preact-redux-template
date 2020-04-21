@@ -31,6 +31,21 @@ class Grid extends Component {
             )
     }
 
+    handleSave (data) {
+        console.log ('SAVE');
+
+        // Display the key/value pairs
+        for(var pair of data.entries()) {
+            console.log(pair[0]+ ', '+ pair[1]);
+        }
+
+    }
+
+    handleDelete (data) {
+        console.log ('DELETE', data);
+
+    }
+
     render() {
         const { error, isLoaded, items } = this.state;
         if (error) {
@@ -57,8 +72,8 @@ class Grid extends Component {
 
 
             return (<>
-                    <DataTableGrid formContent={formContent} title="Example Grid" name="testGrid" columns={columns} data={data} showOptions="true" />
-                    <DataTableGrid formContent={formContent} title="Example Grid2" name="testGrid2" columns={columns2} data={data} />
+                    <DataTableGrid formContent={formContent} onSave={this.handleSave} onDelete={this.handleDelete} title="Example Grid" name="testGrid" columns={columns} data={data} showOptions="true" />
+                    <DataTableGrid formContent={formContent} onSave={this.handleSave} onDelete={this.handleDelete} title="Example Grid2" name="testGrid2" columns={columns2} data={data} />
                 </>
             );
         }
