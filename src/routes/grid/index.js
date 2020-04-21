@@ -1,5 +1,6 @@
 import { Component } from 'preact';
 import DataTableGrid from "../../components/data-table";
+import BSInput from "../../components/bs-input";
 
 class Grid extends Component {
     state = {
@@ -43,9 +44,22 @@ class Grid extends Component {
                 data: "name", title: "Name"
             }];
 
-            const data = [{id: 1, name: "Test"},  {id: 2, name: "Something"}]
-            return (
-                <DataTableGrid title="Example Grid" name="testGrid" columns={columns} data={data}  />
+            const columns2 = [{
+                data: "id", title: "ID"
+            }, {
+                data: "name", title: "Name"
+            }];
+
+            const formContent =  <><BSInput cols="12" label="Name" name="name" required="true" /></>;
+
+
+            const data = [{id: 1, name: "Test"},  {id: 2, name: "Something"}];
+
+
+            return (<>
+                    <DataTableGrid formContent={formContent} title="Example Grid" name="testGrid" columns={columns} data={data} showOptions="true" />
+                    <DataTableGrid formContent={formContent} title="Example Grid2" name="testGrid2" columns={columns2} data={data} />
+                </>
             );
         }
     }

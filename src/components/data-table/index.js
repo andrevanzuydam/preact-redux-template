@@ -26,13 +26,98 @@ class DataTableGrid extends Component {
             .destroy(true);
     }
 
-    populateFormData() {
+    clearFormData() {
+        const {name, path} = this.props;
+        const modalForm = `form${name}`;
+        const recordId = `${name}id`;
+        $(`#${recordId}`).val('');
+        let data = {};
 
+        jQuery(`#${modalForm} select, #${modalForm} input, #${modalForm} textarea`).each(function(key, element){
+            if (element.name) {
+                if (element.type == 'checkbox') {
+                    element.checked = false;
+                } else {
+                    element.value = "";
+                }
+            }
+        });
     }
 
-    handlePopulateClick() {
-        console.log ('POPULATE', $(this.modalRef.current), this.data);
-        jQuery(this.modalRef.current).modal('toggle');
+    populateFormData( data, modal ) {
+        const {name, path} = this.props;
+        let {recordName} = this.props;
+        const modalOkButtonId = `modal${name}ButtonId`;
+        const modalTitle = `modalTitle${name}`;
+        const modalForm = `form${name}`;
+        const recordId = `${name}id`;
+
+        if (recordName === undefined) {
+            recordName = "Record";
+        }
+
+        jQuery(`#${modalOkButtonId}`).unbind('click');
+        if (data.id !== undefined ) {
+            if (path !== undefined) {
+                fetch(`${path}/` + data.id) // Call the fetch function passing the url of the API as a parameter
+                    .then(res => res.json())
+                    .then(function (result) {
+                        let id = jQuery(`#${recordId}`);
+                        id.val(result.id);
+                        $.each(result, function (key, value) {
+                            if (jQuery('#' + key).is(':checkbox')) {
+                                if (value === jQuery('#' + key).val()) {
+                                    jQuery('#' + key).prop('checked', true);
+                                } else {
+                                    jQuery('#' + key).prop('checked', false);
+                                }
+                            } else {
+                                jQuery('#' + key).val(value);
+                            }
+                        });
+                        jQuery(`#${modalTitle}`).html(`Edit ${recordName}`);
+                        jQuery(modal).modal('toggle');
+                        jQuery(`#${modalOkButtonId}`).bind('click', function() { if ( jQuery(`#${modalForm}`).valid() ) { this.saveForm(false); jQuery(modal).modal('toggle'); } }.bind(this, modal, jQuery));
+                    })
+                    .catch(function () {
+                        console.log('Could not fetch data for record');
+                    });
+            } else {
+                jQuery(`#${modalTitle}`).html(`Edit ${recordName}`);
+                let id = jQuery(`#${recordId}`);
+                id.val(data.id);
+                $.each(data, function (key, value) {
+                    if (jQuery(`#${modalForm} input[name=${key}]`).is(':checkbox')) {
+                        if (value === jQuery(`#${modalForm} input[name=${key}]`).val()) {
+                            jQuery(`#${modalForm} input[name=${key}]`).prop('checked', true);
+                        } else {
+                            jQuery(`#${modalForm} input[name=${key}]`).prop('checked', false);
+                        }
+                    } else {
+                        jQuery(`#${modalForm} input[name=${key}]`).val(value);
+                    }
+                });
+
+                jQuery(modal).modal('toggle');
+                jQuery(`#${modalOkButtonId}`).bind('click', function() { if ( jQuery(`#${modalForm}`).valid() ) { this.saveForm(false); jQuery(modal).modal('toggle'); } }.bind(this, modal, jQuery));
+
+            }
+        } else {
+            this.clearFormData();
+            jQuery(`#${modalTitle}`).html(`Create ${recordName}`);
+            jQuery(modal).modal('toggle');
+            jQuery(`#${modalOkButtonId}`).bind('click', function() { if ( jQuery(`#${modalForm}`).valid() ) { this.saveForm(true); jQuery(modal).modal('toggle'); } }.bind(this, modal, jQuery));
+        }
+    }
+
+    saveForm(createRecord) {
+        console.log ('SAVING', createRecord);
+    }
+
+    handlePopulateClick(data) {
+        console.log ('POPULATE', data, jQuery(this.modalRef.current), this);
+        this.populateFormData(data, this.modalRef.current);
+        //jQuery(this.modalRef.current).modal('toggle');
     }
 
     handleDeleteClick() {
@@ -55,9 +140,9 @@ class DataTableGrid extends Component {
 
             let domSettings = ``;
             if (showOptions) {
-               domSettings = `<"data-table-wrapper"<"row"<"col-md-6"<"#${name}Buttons">><"col-md-4"f><"col-md-2"l>><rtip>>`;
+               domSettings = `<"data-table-wrapper-${name}"<"row"<"col-md-6"<"#${name}Buttons">><"col-md-4"f><"col-md-2"l>><rtip>>`;
             } else {
-               domSettings = `<"data-table-wrapper"<"row"<"col-md-4"l><"col-md-4"><"col-md-4"f>><rtip>>`;
+               domSettings = `<"data-table-wrapper-${name}"<"row"<"col-md-4"l><"col-md-4"><"col-md-4"f>><rtip>>`;
             }
 
             let options = {dom: domSettings,
@@ -67,13 +152,13 @@ class DataTableGrid extends Component {
                 createdRow:  function (args, args2, row, data, dataIndex, cells) {
                                     console.log (args, args2, row, data, dataIndex, cells);
                                     if (showOptions) {
-                                        componentInstance.data = data;
+                                        //componentInstance.data = data;
                                         render(<><button class="btn btn-primary"
-                                                         onClick={componentInstance.handlePopulateClick.bind(componentInstance)}>Edit
+                                                         onClick={componentInstance.handlePopulateClick.bind(componentInstance,data)}>Edit
                                                 </button>
                                                 &nbsp;
                                                 <button className="btn btn-danger"
-                                                        onClick={componentInstance.handleDeleteClick.bind(componentInstance)}>Del
+                                                        onClick={componentInstance.handleDeleteClick.bind(componentInstance,data)}>Del
                                                 </button></>
                                             , cells[cells.length-1]);
                                     }
@@ -90,8 +175,6 @@ class DataTableGrid extends Component {
                 options['data'] = data;
             }
 
-
-
             let dataTable = $(`#${name}`).DataTable(options);
 
             if (showOptions) {
@@ -104,7 +187,7 @@ class DataTableGrid extends Component {
                     window.MyDataTables = {};
                 }
 
-                window.MyDataTables[`${name}`] = $('.data-table-wrapper')
+                window.MyDataTables[`${name}`] = $(`.data-table-wrapper-${name}`)
                     .find('table')
                     .DataTable();
             }
@@ -125,7 +208,7 @@ class DataTableGrid extends Component {
 
         if (showOptions !== undefined) {
 
-            adjustedColumns.push ({title: "Options", mRender: function() { return ''; }})
+            adjustedColumns.push ({title: "Options", width: "100px", mRender: function() { return ''; }})
         }
 
         const tableColumns = adjustedColumns.map (function (column) {
@@ -144,7 +227,7 @@ class DataTableGrid extends Component {
         return (
             <div>
                 <h3>{title}</h3>
-                <table id={name} ref={this.tableRef} className="display table table-striped table-bordered table-condensed table-sm"
+                <table id={name} ref={this.tableRef} className="table table-striped table-bordered table-condensed table-sm"
                        style="width:100%">
                     <thead>
                     <tr>
@@ -182,62 +265,6 @@ class DataTableGrid extends Component {
                     </form>
                 </div>
                 <Helmet><script>{`  
-                    window.populate${name}FormData =  function populate${name}FormData( id ) { 
-                         $('#${modalOkButtonId}').unbind('click');
-                         if (id !== null ) {   
-                            fetch('${path}/'+id) // Call the fetch function passing the url of the API as a parameter
-                            .then(res => res.json())
-                            .then(function(result) {
-                                 
-                                 let id = $('#${recordId}');
-                                 id.val(result.id);
-                                 $.each (result, function (key,value) {
-                                   
-                                    if ($('#'+key).is(':checkbox')) {
-                                   
-                                        if (value === $('#'+key).val()) {
-                                            $('#'+key).prop('checked', true);
-                                        } else {
-                                            $('#'+key).prop('checked', false);
-                                        }
-                                    } 
-                                
-                                      else {
-                                         
-                                         $('#'+key).val(value);
-                                      }
-                                 });
-                                 $('#${modalTitle}').html('Edit ${recordName}');
-                                 $('#modal${name}').modal('toggle');
-                                 $('#${modalOkButtonId}').bind('click', function() { if ( $('#${modalForm}').valid() ) { save${name}Form(false); $('#modal${name}').modal('toggle'); } });    
-                            })
-                            .catch(function() {
-                                console.log ('Could not fetch data for record');
-                            });
-                         } else {
-                            clear${name}FormData();
-                            $('#${modalTitle}').html('Create ${recordName}');
-                            $('#modal${name}').modal('toggle');
-                            $('#${modalOkButtonId}').bind('click', function() { if ( $('#${modalForm}').valid() ) { save${name}Form(true); $('#modal${name}').modal('toggle'); } });    
-                         }
-                        
-                    }
-                    
-                    function clear${name}FormData() {
-                        let id = $('#${recordId}').val();
-                        let data = {};
-                     
-                        $("#${modalForm} select, #${modalForm} input, #${modalForm} textarea").each(function(key, element){
-                            if (element.name) {
-                                if (element.type == 'checkbox') {
-                                   element.checked = false;
-                                } else {
-                                    element.value = "";
-                                }
-                            }
-                        });                      
-                        return JSON.stringify(data);
-                    }
                     
                     
                     function get${name}FormData() {
